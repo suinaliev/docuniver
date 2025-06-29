@@ -1,0 +1,140 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="display-6 fw-bold text-primary">
+                        <i class="fas fa-file-alt me-2"></i>Документы
+                    </h2>
+                    <p class="text-muted mb-0">Управление документами учебного заведения</p>
+                </div>
+                {% if is_admin %}
+                <a href="{% url 'document_create' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Добавить документ
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if documents %}
+    <div class="row g-4">
+        {% for document in documents %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm document-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="document-icon mb-3">
+                        <span class="document-emoji">{{ document.icon }}</span>
+                    </div>
+                    
+                    <h5 class="card-title mb-3">{{ document.name }}</h5>
+                    
+                    <div class="document-info mb-3 flex-grow-1">
+                        {% if document.notes %}
+                        <p class="card-text text-muted">{{ document.notes|truncatechars:100 }}</p>
+                        {% endif %}
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            {{ document.created_at|date:"d.m.Y H:i" }}
+                        </small>
+                    </div>
+                    
+                    <div class="document-actions mt-auto">
+                        {% if document.document %}
+                        <a href="{{ document.document.url }}" target="_blank" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="fas fa-download me-1"></i>Скачать
+                        </a>
+                        {% endif %}
+                        
+                        {% if is_admin %}
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'document_update' document.pk %}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'document_delete' document.pk %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-file-alt fa-5x text-muted mb-3"></i>
+                    <h3 class="text-muted mb-3">Документов пока нет</h3>
+                    <p class="text-muted mb-4">Начните добавлять документы для управления ими</p>
+                    {% if is_admin %}
+                    <a href="{% url 'document_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Добавить первый документ
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.document-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.document-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+.document-icon {
+    text-align: center;
+}
+
+.document-emoji {
+    font-size: 3rem;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+}
+
+.document-info {
+    min-height: 100px;
+}
+
+.document-actions {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 15px;
+}
+
+.empty-state {
+    padding: 60px 20px;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.btn-group .btn {
+    border-radius: 8px !important;
+    margin-left: 5px;
+}
+</style>
+{% endblock %} 

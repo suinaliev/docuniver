@@ -1,0 +1,49 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'mobilnost' %}">Мобильность</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'mobility_program_detail' program.pk %}">{{ program.title }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Удаление программы</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="card-title mb-0">Удаление программы мобильности</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Вы действительно хотите удалить программу "{{ program.title }}"?</p>
+                    <p class="text-muted">Это действие нельзя будет отменить. Все связанные медиафайлы также будут удалены.</p>
+                    
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Внимание!</h5>
+                        <p class="mb-0">
+                            Будет удалена следующая информация:
+                        </p>
+                        <ul class="mb-0 mt-2">
+                            <li>Основная информация о программе</li>
+                            <li>Описание и требования</li>
+                            <li>Все фотографии и видео</li>
+                        </ul>
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Удалить программу
+                        </button>
+                        <a href="{% url 'mobility_program_detail' program.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Отмена
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

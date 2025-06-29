@@ -1,0 +1,195 @@
+{% extends 'main.html' %}
+
+{% block main %}
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('https://repository-images.githubusercontent.com/191982287/0139a000-8efb-11e9-9556-a68cbfcc5e2a');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+
+  .header {
+    background-color: rgba(255, 255, 255, 0.30);
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 800px;
+  }
+
+  .tile-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+      
+    margin: 0 auto;
+    padding: 30px;
+    background-color: rgba(255, 255, 255, 0.30);
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .tile-container1 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: rgba(255, 255, 255, 0.30);
+    border-radius: 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .tile {
+    background-color: rgba(255, 255, 255, 0.30);
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .tile img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: #f0f8ff;
+    padding: 8px;
+    margin-bottom: 10px;
+    object-fit: contain;
+  }
+
+  .tile-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333333;
+  }
+
+  .file-tile-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr 1fr;
+    align-items: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 12px 20px;
+    margin: 10px 0;
+    border-radius: 16px;
+    text-decoration: none;
+    color: #2c3e50;
+    font-weight: 500;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .file-tile-row:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 500px) {
+    .tile img {
+      width: 60px;
+      height: 60px;
+    }
+
+    .tile-title {
+      font-size: 14px;
+    }
+  }
+</style>
+
+<div class="header">{{ page.title }}</div>
+
+{% if page.children.all %}
+    <div class="tile-container">  
+    {% for child in page.children.all %}
+        {% if child.show_like_document == False%}
+          <a href="{{ child.get_absolute_url }}">
+            <div class="tile">
+              {% if child.title == "Учебная работа" %}
+                <img src="https://avatars.mds.yandex.net/i?id=4ff0c55ba6e653c44cf95f5eabf8712946311274-4233236-images-thumbs&n=13" alt="Учебная работа">
+              {% elif child.title == "Индивидуальные планы" %}
+                <img src="https://cdn-icons-png.flaticon.com/128/2098/2098276.png" alt="Индивидуальные планы">
+              {% elif child.title == "Профориентация" %}
+                <img src="https://avatars.mds.yandex.net/i?id=1312bf162e6d4710e9a68a72d6e4eaba4b0e1d26-5147142-images-thumbs&n=13" alt="Профориентация">
+              {% elif child.title == "Научно-исследовательская деятельность" %}
+                <img src="https://avatars.mds.yandex.net/i?id=3803dc25871d431eadf1de4e9a5ee2edbbfdab3f-5359329-images-thumbs&n=13" alt="Научно-исследовательская деятельность">
+              {% elif child.title == "Издательская деятельность" %}
+                <img src="https://avatars.mds.yandex.net/i?id=668eeb6732d3e475da0dd81d8f64f33481394a6e-5353565-images-thumbs&n=13" alt="Издательская деятельность">
+              {% elif child.title == "Педагогическая нагрузка" %}
+                <img src="https://avatars.mds.yandex.net/i?id=3e4febcd88c017ba595eec198018b08ac90ac51a-11271031-images-thumbs&n=13" alt="Педагогическая нагрузка">
+              {% else %}
+                <img src="https://cdn-icons-png.flaticon.com/128/10400/10400117.png" alt="{{ child.title }}">
+              {% endif %}
+              <div class="tile-title">{{ child.title }}</div>
+            </div>
+          </a>
+          
+        {% elif child.show_like_document == True %}
+            <div class="tile-container1" style="display: block;">
+              <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; font-weight: bold; margin-bottom: 12px;">
+              <div>Индекс дела</div>
+              <div>Документ</div>
+              <div>Сроки хранение</div>
+              <div>Примечание</div>
+            </div>
+            
+            <a href="{{ child.get_absolute_url }}" target="_blank" class="file-tile-row">
+                <div>{{ file.index }}</div>
+                <div><div class="tile-title">{{ child.title }}</div></div>
+                <div>{{ file.timestore }}</div>
+                <div>{{ file.notes }}</div>
+              </a>
+        
+            
+        {% endif %}
+    {% endfor %}
+    </div>  
+  
+{% endif %}
+
+{% if files %}
+    {% if files.first.show_like_sub_document == False %}
+      <div class="tile-container1" style="display: block;">
+        <div style="display: grid; grid-template-columns: 1fr 2fr 2fr 1fr; font-weight: bold; margin-bottom: 12px;">
+          <div>Индекс дела</div>
+          <div>Документ</div>
+          <div>Сроки хранение</div>
+          <div>Примечание</div>
+        </div>
+        {% for file in files %}
+          <a href="{{ file.file.url }}" target="_blank" class="file-tile-row">
+            <div>{{ file.index }}</div>
+            <div>{{ file.title }}</div>
+            <div>{{ file.timestore }}</div>
+            <div>{{ file.notes }}</div>
+          </a>
+        {% endfor %}
+        
+      {% elif files.first.show_like_sub_document == True %}  
+         {% for file in files %}
+          <a href="{{ file.file.url }}" target="_blank" class="file-tile-row">
+            <div>{{ file.title }}</div>
+          </a>
+        {% endfor %}
+        
+      {%endif%}
+  </div>
+{% endif %}
+
+{% endblock %}

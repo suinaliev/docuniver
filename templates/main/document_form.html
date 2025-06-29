@@ -1,0 +1,146 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        {% if document %}
+                            <i class="fas fa-edit me-2"></i>Редактировать документ
+                        {% else %}
+                            <i class="fas fa-plus me-2"></i>Создать документ
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Название документа</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ document.name|default:'' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Категория</label>
+                                                        <select class="form-select" id="category" name="category" required>
+                                <option value="">Выберите категорию</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" 
+                                            {% if document.category and document.category.id == category.id %}selected{% endif %}
+                                            data-level="{{ category.get_level }}">
+                                    {% if category.get_level == 0 %}{{ category.name }}{% elif category.get_level == 1 %}— {{ category.name }}{% elif category.get_level == 2 %}—— {{ category.name }}{% elif category.get_level == 3 %}——— {{ category.name }}{% elif category.get_level == 4 %}———— {{ category.name }}{% else %}————— {{ category.name }}{% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="document" class="form-label">Файл документа</label>
+                            <input type="file" class="form-control" id="document" name="document"
+                                   {% if not document %}required{% endif %}>
+                            {% if document.document %}
+                            <div class="form-text">
+                                Текущий файл: 
+                                <a href="{{ document.document.url }}" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-file me-1"></i>{{ document.document.name }}
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Теги (через запятую)</label>
+                            <input type="text" class="form-control" id="tags" name="tags" 
+                                   value="{{ document.tags|default:'' }}" 
+                                   placeholder="например: важный, срочный, отчет">
+                            <div class="form-text">Используйте теги для лучшего поиска документов</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="index" class="form-label">Индекс документа</label>
+                            <input type="text" class="form-control" id="index" name="index" 
+                                   value="{{ document.index|default:'' }}" 
+                                   placeholder="например: 11-01">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="timestore" class="form-label">Срок хранения</label>
+                            <input type="text" class="form-control" id="timestore" name="timestore" 
+                                   value="{{ document.timestore|default:'' }}" 
+                                   placeholder="например: 5 лет, постоянно">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Примечания</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="4" 
+                                      placeholder="Дополнительная информация о документе">{{ document.notes|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_important" name="is_important" 
+                                   {% if document.is_important %}checked{% endif %}>
+                            <label class="form-check-label" for="is_important">
+                                <i class="fas fa-star text-warning me-1"></i>Важный документ
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'document_list' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i>Отмена
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Сохранить документ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Стили для иерархии категорий */
+#category option[data-level="1"] {
+    padding-left: 20px;
+}
+#category option[data-level="2"] {
+    padding-left: 40px;
+}
+#category option[data-level="3"] {
+    padding-left: 60px;
+}
+#category option[data-level="4"] {
+    padding-left: 80px;
+}
+#category option[data-level="5"] {
+    padding-left: 100px;
+}
+
+/* Дополнительные стили для карточки */
+.card {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+</style>
+{% endblock %} 

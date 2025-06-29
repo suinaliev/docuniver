@@ -1,0 +1,81 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Подтверждение удаления
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Внимание!</strong> Это действие нельзя отменить.
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Вы действительно хотите удалить категорию?</h5>
+                    
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="me-3">
+                                    <div class="icon-wrapper" style="width: 50px; height: 50px; background: {{ category.color }}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                        <i class="{{ category.icon }}"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">{{ category.name }}</h6>
+                                    {% if category.description %}
+                                    <p class="text-muted mb-0 small">{{ category.description|truncatechars:100 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center mt-3">
+                                <div class="col-6">
+                                    <strong>{{ category.get_children_count }}</strong><br>
+                                    <small class="text-muted">Подкатегорий</small>
+                                </div>
+                                <div class="col-6">
+                                    <strong>{{ category.get_documents_count }}</strong><br>
+                                    <small class="text-muted">Документов</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if category.get_children_count > 0 or category.get_documents_count > 0 %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Осторожно!</strong> 
+                    При удалении этой категории также будут удалены:
+                    <ul class="mb-0 mt-2">
+                        {% if category.get_children_count > 0 %}
+                        <li>{{ category.get_children_count }} подкатегории(й)</li>
+                        {% endif %}
+                        {% if category.get_documents_count > 0 %}
+                        <li>{{ category.get_documents_count }} документ(ов)</li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post" class="d-flex justify-content-between">
+                    {% csrf_token %}
+                    <a href="{% url 'category_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Отмена
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Да, удалить категорию
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

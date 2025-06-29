@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="alert alert-success">
+        <h1>🎉 Тест страницы!</h1>
+        <p>Если вы видите эту страницу.</p>
+        
+        <h3>Информация о пользователе:</h3>
+        <ul>
+            <li>Пользователь: {{ user.username }}</li>
+            <li>Аутентифицирован: {{ user.is_authenticated }}</li>
+            <li>Админ: {{ user.is_staff }}</li>
+        </ul>
+        
+        <h3>Данные из view:</h3>
+        <ul>
+            <li>is_admin: {{ is_admin }}</li>
+            <li>Количество категорий: {{ categories.count|default:"Не передано" }}</li>
+        </ul>
+        
+        <div class="mt-3">
+            <a href="{% url 'category_list' %}" class="btn btn-primary">Вернуться к категориям</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

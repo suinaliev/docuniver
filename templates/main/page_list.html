@@ -1,0 +1,165 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="display-6 fw-bold text-success">
+                        <i class="fas fa-file-lines me-2"></i>Страницы
+                    </h2>
+                    <p class="text-muted mb-0">Управление информационными страницами</p>
+                </div>
+                {% if is_admin %}
+                <a href="{% url 'page_create' %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-plus me-2"></i>Создать страницу
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if pages %}
+    <div class="row g-4">
+        {% for page in pages %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm page-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="page-icon mb-3">
+                        <i class="fas fa-file-lines"></i>
+                    </div>
+                    
+                    <h5 class="card-title mb-3">{{ page.title }}</h5>
+                    
+                    <div class="page-info mb-3 flex-grow-1">
+                        {% if page.content %}
+                        <p class="card-text text-muted">{{ page.content|truncatechars:120|striptags }}</p>
+                        {% endif %}
+                        <div class="page-meta">
+                            <small class="text-muted">
+                                <i class="fas fa-link me-1"></i>
+                                /{{ page.slug }}/
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="page-actions mt-auto">
+                        <a href="{% url 'page_view' page.slug %}" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="fas fa-eye me-1"></i>Просмотр
+                        </a>
+                        
+                        {% if is_admin %}
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'page_update' page.pk %}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'page_delete' page.pk %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Показываем дочерние страницы если есть -->
+                {% if page.children.all %}
+                <div class="card-footer bg-light">
+                    <small class="text-muted">
+                        <i class="fas fa-sitemap me-1"></i>
+                        Подстраниц: {{ page.children.count }}
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-file-lines fa-5x text-muted mb-3"></i>
+                    <h3 class="text-muted mb-3">Страниц пока нет</h3>
+                    <p class="text-muted mb-4">Создайте информационные страницы для вашего портала</p>
+                    {% if is_admin %}
+                    <a href="{% url 'page_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Создать первую страницу
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.page-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    border-left: 4px solid #28a745;
+}
+
+.page-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(40, 167, 69, 0.1) !important;
+    border-left-color: #20c997;
+}
+
+.page-icon {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.page-icon i {
+    font-size: 3rem;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+}
+
+.page-info {
+    min-height: 120px;
+}
+
+.page-meta {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+.page-actions {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 15px;
+}
+
+.empty-state {
+    padding: 60px 20px;
+}
+
+.card-title {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.btn-group .btn {
+    border-radius: 8px !important;
+    margin-left: 5px;
+}
+
+.card-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 12px 20px;
+}
+</style>
+{% endblock %} 

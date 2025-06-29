@@ -1,0 +1,186 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'category_list' %}">
+                    <i class="fas fa-home me-1"></i>Категории
+                </a>
+            </li>
+            {% for breadcrumb in breadcrumbs %}
+                {% if forloop.last %}
+                <li class="breadcrumb-item active" aria-current="page">{{ breadcrumb.name }}</li>
+                {% else %}
+                <li class="breadcrumb-item">
+                    <a href="{% url 'category_detail' breadcrumb.slug %}">{{ breadcrumb.name }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </nav>
+
+    <!-- Заголовок категории -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="category-header p-4 rounded-3" style="background: linear-gradient(135deg, {{ category.color }}, {{ category.color }}dd);">
+                <div class="d-flex align-items-center text-white">
+                    <div class="category-icon-large me-4">
+                        <i class="{{ category.icon }}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h1 class="display-6 fw-bold mb-2">{{ category.name }}</h1>
+                        {% if category.description %}
+                        <p class="lead mb-0">{{ category.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="category-stats-header">
+                        <div class="stat-row">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ subcategories.count }}</div>
+                                <div class="stat-label">Подкатегорий</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">{{ documents.count }}</div>
+                                <div class="stat-label">Документов</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подкатегории -->
+    {% if subcategories %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-folder me-2 text-primary"></i>Подкатегории
+            </h3>
+            <div class="row g-3">
+                {% for subcategory in subcategories %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card subcategory-card h-100" style="border-left: 3px solid {{ subcategory.color }};">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="subcategory-icon me-3" style="color: {{ subcategory.color }};">
+                                    <i class="{{ subcategory.icon }}"></i>
+                                </div>
+                                <h6 class="card-title mb-0 flex-grow-1">{{ subcategory.name }}</h6>
+                                <small class="text-muted">{{ subcategory.get_documents_count }} док.</small>
+                            </div>
+                            {% if subcategory.description %}
+                            <p class="card-text small text-muted mb-3">{{ subcategory.description|truncatechars:60 }}</p>
+                            {% endif %}
+                            <a href="{% url 'category_detail' subcategory.slug %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-arrow-right me-1"></i>Перейти
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Документы -->
+    {% if documents %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">
+                    <i class="fas fa-file-alt me-2 text-success"></i>Документы в категории
+                </h3>
+                {% if category.get_documents_count > documents.count %}
+                <a href="{% url 'category_documents' category.slug %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-list me-1"></i>Все документы ({{ category.get_documents_count }})
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="row g-4">
+                {% for document in documents %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card document-card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <div class="document-icon-detail mb-3 text-center">
+                                <span class="file-icon">{{ document.icon }}</span>
+                                <div class="file-type">{{ document.file_type }}</div>
+                            </div>
+                            
+                            <h6 class="card-title mb-3">{{ document.name }}</h6>
+                            
+                            {% if document.notes %}
+                            <p class="card-text text-muted small mb-3">{{ document.notes|truncatechars:80 }}</p>
+                            {% endif %}
+                            
+                            {% if document.get_tags_list %}
+                            <div class="document-tags mb-3">
+                                {% for tag in document.get_tags_list %}
+                                <span class="badge bg-secondary me-1">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="document-meta mb-3 mt-auto">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    {{ document.created_at|date:"d.m.Y H:i" }}
+                                </small>
+                                {% if document.created_by %}
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i>
+                                    {{ document.created_by.get_full_name|default:document.created_by.username }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="document-actions">
+                                {% if document.document %}
+                                <a href="{{ document.document.url }}" target="_blank" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-download me-1"></i>Скачать
+                                </a>
+                                {% endif %}
+                                
+                                {% if is_admin %}
+                                <div class="btn-group ms-2" role="group">
+                                    <a href="{% url 'document_update' document.pk %}" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'document_delete' document.pk %}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="empty-documents">
+                    <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted mb-3">В этой категории пока нет документов</h4>
+                    {% if is_admin %}
+                    <a href="{% url 'document_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Добавить документ
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

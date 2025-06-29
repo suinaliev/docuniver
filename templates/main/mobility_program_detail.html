@@ -1,0 +1,137 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'mobilnost' %}">Мобильность</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ program.title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="card-title mb-0">{{ program.title }}</h2>
+                    {% if is_admin %}
+                    <div class="btn-group">
+                        <a href="{% url 'mobility_program_update' program.pk %}" class="btn btn-light">
+                            <i class="fas fa-edit me-2"></i>Редактировать
+                        </a>
+                        <a href="{% url 'mobility_program_delete' program.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Удалить
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-4">
+                                <h4>Информация о программе</h4>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong><i class="fas fa-university me-2"></i>Университет:</strong><br>{{ program.university }}</p>
+                                        <p><strong><i class="fas fa-globe me-2"></i>Страна:</strong><br>{{ program.country }}</p>
+                                        <p><strong><i class="fas fa-tag me-2"></i>Тип программы:</strong><br>{{ program.get_program_type_display }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong><i class="fas fa-calendar me-2"></i>Период:</strong><br>{{ program.start_date|date:"d.m.Y" }} - {{ program.end_date|date:"d.m.Y" }}</p>
+                                        <p><strong><i class="fas fa-clock me-2"></i>Продолжительность:</strong><br>{{ program.duration }}</p>
+                                        <p><strong><i class="fas fa-check-circle me-2"></i>Статус:</strong><br>
+                                            {% if program.is_active %}
+                                            <span class="badge bg-success">Активная</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Неактивная</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4>Описание программы</h4>
+                                <hr>
+                                <p class="text-justify">{{ program.description|linebreaks }}</p>
+                            </div>
+
+                            <div class="mb-4">
+                                <h4>Требования к участникам</h4>
+                                <hr>
+                                <p class="text-justify">{{ program.requirements|linebreaks }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Медиагалерея</h5>
+                                    {% if is_admin %}
+                                    <a href="{% url 'mobility_media_create' program.pk %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus me-2"></i>Добавить
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    {% if media %}
+                                        {% for item in media %}
+                                            <div class="mb-3 position-relative">
+                                                {% if item.media_type == 'photo' %}
+                                                    <img src="{{ item.file.url }}" class="img-fluid rounded" alt="{{ item.title }}">
+                                                {% elif item.media_type == 'video' %}
+                                                    <div class="ratio ratio-16x9 mb-2">
+                                                        {% if item.video_url %}
+                                                            <iframe src="{{ item.video_url }}" allowfullscreen></iframe>
+                                                        {% else %}
+                                                            <video src="{{ item.file.url }}" controls class="rounded"></video>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <div class="mt-2">
+                                                    <h6 class="mb-1">{{ item.title }}</h6>
+                                                    {% if item.description %}
+                                                        <p class="small text-muted mb-2">{{ item.description }}</p>
+                                                    {% endif %}
+                                                    
+                                                    {% if is_admin %}
+                                                        <a href="{% url 'mobility_media_delete' item.pk %}" class="btn btn-outline-danger btn-sm">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-muted text-center mb-0">Нет медиафайлов</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-justify {
+        text-align: justify;
+    }
+    
+    .img-fluid {
+        max-height: 300px;
+        width: 100%;
+        object-fit: cover;
+    }
+    
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 1em;
+    }
+</style>
+{% endblock %} 

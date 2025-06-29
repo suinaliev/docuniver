@@ -1,0 +1,46 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if page %}Редактировать страницу{% else %}Создать страницу{% endif %}</h2>
+    
+    <form method="post" class="mt-3">
+        {% csrf_token %}
+        
+        <div class="form-group mb-3">
+            <label for="title">Заголовок</label>
+            <input type="text" class="form-control" id="title" name="title" 
+                   value="{{ page.title|default:'' }}" required>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="slug">Slug</label>
+            <input type="text" class="form-control" id="slug" name="slug" 
+                   value="{{ page.slug|default:'' }}" required>
+            <small class="form-text text-muted">
+                Используйте только буквы, цифры, дефисы и подчеркивания
+            </small>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="parent">Родительская страница</label>
+            <select class="form-control" id="parent" name="parent">
+                <option value="">Нет родительской страницы</option>
+                {% for p in pages %}
+                <option value="{{ p.id }}" {% if page.parent_id == p.id %}selected{% endif %}>
+                    {{ p.title }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="content">Содержимое</label>
+            <textarea class="form-control" id="content" name="content" rows="10">{{ page.content|default:'' }}</textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="{% url 'page_list' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %} 

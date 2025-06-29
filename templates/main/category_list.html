@@ -1,0 +1,275 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold text-primary mb-2">
+                    <i class="fas fa-sitemap me-3"></i>Номенклатурные документы
+                </h1>
+                <p class="lead text-muted">Иерархическая структура документооборота образовательного портала</p>
+                
+                {% if is_admin %}
+                <div class="mt-3">
+                    <a href="{% url 'category_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Создать новую категорию
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if categories %}
+    <div class="row g-4">
+        {% for category in categories %}
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+            <div class="card h-100 shadow-sm category-card" style="border-left: 4px solid {{ category.color }};">
+                <div class="card-body d-flex flex-column">
+                    <div class="category-icon mb-3 text-center">
+                        <div class="icon-wrapper" style="background: linear-gradient(135deg, {{ category.color }}, {{ category.color }}dd);">
+                            <i class="{{ category.icon }}"></i>
+                        </div>
+                    </div>
+                    
+                    <h5 class="card-title mb-3 text-center" style="color: {{ category.color }};">
+                        {{ category.name }}
+                    </h5>
+                    
+                    <div class="category-info mb-3 flex-grow-1">
+                        {% if category.description %}
+                        <p class="card-text text-muted small">{{ category.description|truncatechars:80 }}</p>
+                        {% endif %}
+                        
+                        <div class="category-stats">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-number">{{ category.get_children_count }}</div>
+                                        <div class="stat-label">Подкатегорий</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-item">
+                                        <div class="stat-number">{{ category.get_documents_count }}</div>
+                                        <div class="stat-label">Документов</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-actions mt-auto">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'category_detail' category.slug %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-folder-open me-1"></i>Обзор категории
+                            </a>
+                            {% if category.get_documents_count > 0 %}
+                            <a href="{% url 'category_documents' category.slug %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-file-alt me-1"></i>Все документы
+                            </a>
+                            {% endif %}
+                            
+                            {% if is_admin %}
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <a href="{% url 'category_update' category.pk %}" class="btn btn-warning btn-sm w-100">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="{% url 'category_delete' category.pk %}" class="btn btn-danger btn-sm w-100">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Индикатор уровня вложенности -->
+                <div class="category-level">
+                    <i class="fas fa-layer-group"></i>
+                    Уровень {{ category.get_level|add:1 }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-sitemap fa-5x text-muted mb-3"></i>
+                    <h3 class="text-muted mb-3">Категории не найдены</h3>
+                    <p class="text-muted mb-4">Структура категорий пока не создана</p>
+                    {% if is_admin %}
+                    <a href="{% url 'document_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Создать структуру
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.category-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.category-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+}
+
+.category-icon {
+    position: relative;
+}
+
+.icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: white;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.category-stats {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-actions {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 15px;
+}
+
+.category-level {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.empty-state {
+    padding: 80px 20px;
+}
+
+.card-title {
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* Анимация для карточек */
+.category-card {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.category-card:nth-child(1) { animation-delay: 0.1s; }
+.category-card:nth-child(2) { animation-delay: 0.2s; }
+.category-card:nth-child(3) { animation-delay: 0.3s; }
+.category-card:nth-child(4) { animation-delay: 0.4s; }
+.category-card:nth-child(5) { animation-delay: 0.5s; }
+.category-card:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .category-stats .row {
+        margin: 0 -5px;
+    }
+    
+    .category-stats .col-6 {
+        padding: 0 5px;
+    }
+    
+    .stat-number {
+        font-size: 1.2rem;
+    }
+}
+</style>
+
+<script>
+function createCategories() {
+    if (confirm('Создать базовую структуру категорий документов?')) {
+        fetch('/admin/create-categories/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Ошибка при создании структуры');
+            }
+        });
+    }
+}
+
+// Добавляем эффект при клике на карточки
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A') return;
+            
+            const link = this.querySelector('.btn-outline-primary');
+            if (link) {
+                window.location.href = link.href;
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %} 

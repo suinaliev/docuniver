@@ -1,0 +1,62 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'mobilnost' %}">Мобильность</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'mobility_program_detail' media.program.pk %}">{{ media.program.title }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Удаление медиафайла</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="card-title mb-0">Удаление медиафайла</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Вы действительно хотите удалить медиафайл "{{ media.title }}"?</p>
+                    <p class="text-muted">Это действие нельзя будет отменить.</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Информация о медиафайле:</h5>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3">Тип:</dt>
+                                <dd class="col-sm-9">{{ media.get_media_type_display }}</dd>
+                                
+                                <dt class="col-sm-3">Название:</dt>
+                                <dd class="col-sm-9">{{ media.title }}</dd>
+                                
+                                {% if media.description %}
+                                <dt class="col-sm-3">Описание:</dt>
+                                <dd class="col-sm-9">{{ media.description }}</dd>
+                                {% endif %}
+                                
+                                {% if media.media_type == 'photo' and media.file %}
+                                <dt class="col-sm-3">Предпросмотр:</dt>
+                                <dd class="col-sm-9">
+                                    <img src="{{ media.file.url }}" alt="{{ media.title }}" class="img-fluid rounded" style="max-height: 200px;">
+                                </dd>
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Удалить медиафайл
+                        </button>
+                        <a href="{% url 'mobility_program_detail' media.program.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Отмена
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

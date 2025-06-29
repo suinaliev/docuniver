@@ -1,0 +1,108 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="card-title mb-0">
+                        <i class="fas fa-plane me-2"></i>Академическая мобильность
+                    </h2>
+                    {% if is_admin %}
+                    <a href="{% url 'mobility_program_create' %}" class="btn btn-light">
+                        <i class="fas fa-plus me-2"></i>Добавить программу
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if programs %}
+                        <div class="row">
+                            {% for program in programs %}
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 shadow-sm">
+                                        {% with program_media=program.media.all|dictsort:"order"|first %}
+                                            {% if program_media %}
+                                                {% if program_media.media_type == 'photo' %}
+                                                    <img src="{{ program_media.file.url }}" class="card-img-top" alt="{{ program.title }}" style="height: 200px; object-fit: cover;">
+                                                {% elif program_media.media_type == 'video' %}
+                                                    <div class="ratio ratio-16x9">
+                                                        {% if program_media.video_url %}
+                                                            <iframe src="{{ program_media.video_url }}" allowfullscreen></iframe>
+                                                        {% else %}
+                                                            <video src="{{ program_media.file.url }}" controls></video>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <img src="https://via.placeholder.com/300?text=Нет+медиа" class="card-img-top" alt="Нет медиа" style="height: 200px; object-fit: cover;">
+                                            {% endif %}
+                                        {% endwith %}
+                                        
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ program.title }}</h5>
+                                            <p class="card-text text-muted mb-2">
+                                                <i class="fas fa-university me-2"></i>{{ program.university }}
+                                            </p>
+                                            <p class="card-text text-muted mb-2">
+                                                <i class="fas fa-globe me-2"></i>{{ program.country }}
+                                            </p>
+                                            <p class="card-text text-muted mb-2">
+                                                <i class="fas fa-calendar me-2"></i>{{ program.start_date|date:"d.m.Y" }} - {{ program.end_date|date:"d.m.Y" }}
+                                            </p>
+                                            <p class="card-text">{{ program.description|truncatewords:30 }}</p>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <a href="{% url 'mobility_program_detail' program.pk %}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-info-circle me-2"></i>Подробнее
+                                                </a>
+                                                {% if is_admin %}
+                                                <div class="btn-group">
+                                                    <a href="{% url 'mobility_program_update' program.pk %}" class="btn btn-outline-success btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'mobility_program_delete' program.pk %}" class="btn btn-outline-danger btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-plane fa-5x text-muted mb-4"></i>
+                            <h3 class="text-muted mb-3">Пока нет программ мобильности</h3>
+                            <p class="lead text-muted mb-4">
+                                Здесь будут отображаться программы академической мобильности, как только они появятся.
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .btn-group .btn i {
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}

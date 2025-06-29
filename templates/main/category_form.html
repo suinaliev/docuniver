@@ -1,0 +1,176 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-folder-plus me-2"></i>
+                    {% if category %}Редактировать категорию{% else %}Создать новую категорию{% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Название категории <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ category.name|default:'' }}" required>
+                                <div class="form-text">Основное название категории</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="slug" class="form-label">Слаг (URL) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="slug" name="slug" 
+                                       value="{{ category.slug|default:'' }}" required>
+                                <div class="form-text">Используется в URL (только латинские буквы, цифры, дефисы)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ category.description|default:'' }}</textarea>
+                        <div class="form-text">Краткое описание категории</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="parent" class="form-label">Родительская категория</label>
+                                <select class="form-control" id="parent" name="parent">
+                                    <option value="">-- Корневая категория --</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat.id }}" 
+                                                {% if category.parent and cat.id == category.parent.id %}selected{% endif %}>
+                                            {% for i in "x"|rjust:cat.get_level %}└─{% endfor %} {{ cat.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Выберите родительскую категорию (если нужно)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="order" class="form-label">Порядок сортировки</label>
+                                <input type="number" class="form-control" id="order" name="order" 
+                                       value="{{ category.order|default:0 }}" min="0">
+                                <div class="form-text">Число для определения порядка отображения</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="icon" class="form-label">Иконка</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i id="icon-preview" class="{{ category.icon|default:'fas fa-folder' }}"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="icon" name="icon" 
+                                           value="{{ category.icon|default:'fas fa-folder' }}"
+                                           placeholder="fas fa-folder">
+                                </div>
+                                <div class="form-text">CSS класс иконки FontAwesome</div>
+                                
+                                <!-- Популярные иконки -->
+                                <div class="mt-2">
+                                    <small class="text-muted">Популярные иконки:</small><br>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary me-1 mb-1" onclick="setIcon('fas fa-folder')">
+                                        <i class="fas fa-folder"></i> Папка
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary me-1 mb-1" onclick="setIcon('fas fa-file-alt')">
+                                        <i class="fas fa-file-alt"></i> Документ
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary me-1 mb-1" onclick="setIcon('fas fa-graduation-cap')">
+                                        <i class="fas fa-graduation-cap"></i> Образование
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary me-1 mb-1" onclick="setIcon('fas fa-users')">
+                                        <i class="fas fa-users"></i> Люди
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="color" class="form-label">Цвет</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" id="color" name="color" 
+                                           value="{{ category.color|default:'#667eea' }}">
+                                    <input type="text" class="form-control" value="{{ category.color|default:'#667eea' }}" 
+                                           readonly id="color-text">
+                                </div>
+                                <div class="form-text">Основной цвет категории</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if category %}
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                   {% if category.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Активная категория
+                            </label>
+                            <div class="form-text">Неактивные категории скрыты от пользователей</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'category_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>
+                            {% if category %}Обновить{% else %}Создать{% endif %} категорию
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Автоматическое создание слага из названия
+document.getElementById('name').addEventListener('input', function() {
+    if (!document.getElementById('slug').value || document.getElementById('slug').dataset.auto !== 'false') {
+        const slug = this.value
+            .toLowerCase()
+            .replace(/[а-я]/g, function(match) {
+                const ru = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+                const en = 'abvgdeejzijklmnoprstufhccss_y_eua';
+                return en[ru.indexOf(match)] || match;
+            })
+            .replace(/[^a-z0-9\-]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+        document.getElementById('slug').value = slug;
+    }
+});
+
+// Обновление превью иконки
+document.getElementById('icon').addEventListener('input', function() {
+    document.getElementById('icon-preview').className = this.value || 'fas fa-folder';
+});
+
+// Функция для быстрого выбора иконки
+function setIcon(iconClass) {
+    document.getElementById('icon').value = iconClass;
+    document.getElementById('icon-preview').className = iconClass;
+}
+
+// Обновление текстового поля цвета
+document.getElementById('color').addEventListener('input', function() {
+    document.getElementById('color-text').value = this.value;
+});
+</script>
+{% endblock %} 
